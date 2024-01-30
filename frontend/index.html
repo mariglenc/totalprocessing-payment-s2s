@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Payment with iframe</title>
+    <link rel="stylesheet" href="styles.css"/>
+    <script src="./script.js"></script>
+</head>
+
+<body>
+<div class="containerDiv">
+    <div class="leftDiv">
+        <h4>Click the button to make a payment to TP</h4>
+        <button type="button" onclick="submitForm()">Submit</button>
+        <div id="loadingOverlay" style="display: none">
+            Loading...
+            <div id="spinner"></div>
+        </div>
+        <iframe id="paymentIframe" width="600px" height="400px" style="display: none" onload="handleIframeLoad()"></iframe>
+        <div id="responseDiv" style="display: none">
+            <p>the payment was complete !!!!</p>
+            <div id="resultInfo"></div>
+        </div>
+    </div>
+    <div class="rightDiv">
+        <div class="dottedDiv">
+        <h4>1) On submit, call backend on /makePayment which fires the following to TP</h4>
+        <pre>
+            POST eu-test.oppwa.com:443/v1/payments
+            Authorization: 'Bearer OGFjN2E0Y2E4ODA1MzRjODAxODgwNTc1NDAzNDAwYjN8U1dZZXNnMmJ5NQ=='
+            {
+                entityId: '8ac7a4ca880534c801880575423200b5',
+                amount: 50,
+                currency: 'GBP',
+                paymentBrand: 'VISA',
+                paymentType: 'PA',
+                <b>shopperResultUrl</b>: 'http://127.0.0.1:5500/redirectin-page.html',
+                createRegistration: true,
+                'card.number': 4200000000000091,
+                'card.holder': 'Jane Jones',
+                'card.expiryMonth': '05',
+                'card.expiryYear': 2031,
+                'card.cvv': 123,
+                'threeDSecure.challengeIndicator': 4,
+                'customer.browser.acceptHeader': 'text/html',
+                'customer.browser.screenColorDepth': 48,
+                'customer.browser.javaEnabled': false,
+                'customer.browser.language': 'en',
+                'customer.browser.screenHeight': 1200,
+                'customer.browser.screenWidth': 1600,
+                'customer.browser.timezone': 60,
+                'customer.browser.challengeWindow': 4,
+                'customer.browser.userAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+            }
+            
+            RESPONSE 
+            {
+                "id": "8ac7a4a18cad5600018cadb37314404e",
+                "registrationId": "8ac7a4a28cab5c30018cadb3723b7930",
+                "paymentType": "PA",
+                "paymentBrand": "VISA",
+                "result": {
+                    "code": "000.200.000",
+                    "description": "transaction pending"
+                },
+                "card": {
+                    "bin": "420000",
+                    "last4Digits": "0091",
+                    "holder": "Jane Jones",
+                    "expiryMonth": "05",
+                    "expiryYear": "2031"
+                },
+                "customer": {
+                    "browser": {
+                        "acceptHeader": "text/html",
+                        "language": "en",
+                        "screenHeight": "1200",
+                        "screenWidth": "1600",
+                        "timezone": "60",
+                        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+                        "javaEnabled": "false",
+                        "screenColorDepth": "48",
+                        "challengeWindow": "4"
+                    }
+                },
+                "threeDSecure": {
+                    "challengeIndicator": "4"
+                },
+                "customParameters": {
+                    "OPP_card.bin": "420000"
+                },
+                "redirect": {
+                    "url": "https://test.ppipe.net/connectors/asyncresponse_simulator;jsessionid=3A1660A4C53C18A91CB4A6A4662C88B1.uat01-vm-con02?asyncsource=ACI_3DS_2&type=methodRedirect&cdkForward=true&ndcid=8ac7a4ca880534c801880575423200b5_725f0ff58c13400db3f56d002d406db7",
+                    "parameters": [],
+                    "preconditions": [
+                        {
+                            "origin": "iframe#hidden",
+                            "waitUntil": "iframe#load",
+                            "description": "Hidden iframe post for 3D Secure 2.0",
+                            "url": "https://test.ppipe.net/connectors/demo/submit?action=ACI3DS2AccessControlServer&acsRequest=METHOD",
+                            "method": "POST",
+                            "parameters": [
+                                {
+                                    "name": "threeDSMethodData",
+                                    "value": "eyJ0aHJlZURTTWV0aG9kTm90aWZpY2F0aW9uVVJMIjoiaHR0cHM6Ly90ZXN0Lm9wcHdhLmNvbS9jb25uZWN0b3JzL2FyX3NpbXVsYXRvci8zZHMyO2pzZXNzaW9uaWQ9M0ExNjYwQTRDNTNDMThBOTFDQjRBNkE0NjYyQzg4QjEudWF0MDEtdm0tY29uMDI_YXN5bmNzb3VyY2U9QUNJXzNEU18yJnR5cGU9bWV0aG9kTm90aWZpY2F0aW9uJm5kY2lkPThhYzdhNGNhODgwNTM0YzgwMTg4MDU3NTQyMzIwMGI1XzcyNWYwZmY1OGMxMzQwMGRiM2Y1NmQwMDJkNDA2ZGI3IiwidGhyZWVEU1NlcnZlclRyYW5zSUQiOiIxNzViY2FhMy01NzZkLTQ4NzctYmM1YS1hMmZmZTFhMWE2YmEifQ"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "risk": {
+                    "score": "0"
+                },
+                "buildNumber": "7b8c85307457e91b3487ef66ee24c11bb2702bf7@2023-12-21 00:42:34 +0000",
+                "timestamp": "2023-12-27 23:54:27+0000",
+                "ndc": "8ac7a4ca880534c801880575423200b5_725f0ff58c13400db3f56d002d406db7"
+            }
+        </pre>
+    </div>
+        <div class="dottedDiv">
+        <h4>2) When TP redirect to shopperResultUrl, we call backend on /verifyPaymentRequest which fires the following to TP</h4>
+        <pre>
+            GET eu-test.oppwa.com:443/v1/payments/${id}?entityId=8ac7a4ca880534c801880575423200b5
+            Authorization: 'Bearer OGFjN2E0Y2E4ODA1MzRjODAxODgwNTc1NDAzNDAwYjN8U1dZZXNnMmJ5NQ=='
+            
+            RESPONSE
+            {
+            
+            }
+        </pre>
+    </div>
+    </div>
+</div>
+</body>
+</html>
